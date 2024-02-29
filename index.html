@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>King's Crown</title>
+    <link rel="stylesheet" href="./css/main.css" />
+    <script src="./controllers/scorekeeper.js" defer></script>
+</head>
+<!-- Mineral Counting for Miners -->
+<body>
+    <h1 class="main-header">MINING GAME</h1>
+    <h1 id="minerList"></h1>
+    <div class="card">
+        <h2 id="bronzeDisplay">Bronze: 0</h2>
+        <label>
+            <button class="button-92" onclick="updateScore('bronze')">-</button>
+            <button class="button-92" onclick="updateScore('bronze', true)">+</button>
+        </label>
+    </div>
+
+    <div class="card">
+        <h2 id="silverDisplay">Silver: 0</h2>
+        <label>
+            <button class="button-92" onclick="updateScore('silver')">-</button>
+            <button class="button-92" onclick="updateScore('silver', true)">+</button>
+        </label>
+    </div>
+
+    <div class="card">
+        <h2 id="goldDisplay">Gold: 0</h2>
+        <label>
+            <button class="button-92" onclick="updateScore('gold')">-</button>
+            <button class="button-92" onclick="updateScore('gold', true)">+</button>
+        </label>
+    </div>
+
+    <div class="card">
+        <h2 id="diamondDisplay">Diamonds: 0</h2>
+        <label>
+            <button class="button-92" onclick="updateScore('diamond')">-</button>
+            <button class="button-92" onclick="updateScore('diamond', true)">+</button>
+        </label>
+    </div>
+
+    <div class="card">
+        <h2 id="bombDisplay">Bombs: 0</h2>
+        <label>
+            <button class="button-92" onclick="updateScore('bomb')">-</button>
+            <button class="button-92" onclick="updateScore('bomb', true)">+</button>
+        </label>
+    </div>
+
+    <h2 id="score">Score: 0</h2>
+</body>
+<!-- Tracking Players and Teams -->
+<body>
+    <div class="card">
+        <h2>Team 1</h2>
+        <label>Mining?</label>
+        <label>
+            <input type="radio" name="miningRadio" oninput="changeRadio()" checked="checked">
+        </label>
+        <br>
+        <label>
+            <input placeholder="Player 1" oninput="updateNames()" name="player">
+            <input placeholder="Player 2" oninput="updateNames()" name="player">
+            <input placeholder="Player 3" oninput="updateNames()" name="player">
+        </label>
+        <br>
+        <label>
+            <input name="declaration" placeholder="Declaration" oninput="updateDeclared()" type="number">
+            <input name="declaration" placeholder="Declaration" oninput="updateDeclared()" type="number">
+            <input name="declaration" placeholder="Declaration" oninput="updateDeclared()" type="number">
+        </label>
+    </div>
+    <div class="card">
+        <h2>Team 2</h2>
+        <label>Mining?</label>
+        <label>
+            <input type="radio" name="miningRadio" oninput="changeRadio()">
+        </label>
+        <br>
+        <label>
+            <input placeholder="Player 4" oninput="updateNames()" name="player">
+            <input placeholder="Player 5" oninput="updateNames()" name="player">
+            <input placeholder="Player 6" oninput="updateNames()" name="player">
+        </label>
+        <br>
+        <label>
+            <input name="declaration" placeholder="Declaration" oninput="updateDeclared()">
+            <input name="declaration" placeholder="Declaration" oninput="updateDeclared()">
+            <input name="declaration" placeholder="Declaration" oninput="updateDeclared()">
+        </label>
+    </div>
+    <div class="card">
+        <h2>Team 3</h2>
+        <label>Mining?</label>
+        <label>
+            <input type="radio" name="miningRadio" oninput="changeRadio()">
+        </label>
+        <br>
+        <label>
+            <input placeholder="Player 7" oninput="updateNames()" name="player">
+            <input placeholder="Player 8" oninput="updateNames()" name="player">
+            <input placeholder="Player 9" oninput="updateNames()" name="player">
+        </label>
+        <br>
+        <label>
+            <input name="declaration" placeholder="Declaration" oninput="updateDeclared()">
+            <input name="declaration" placeholder="Declaration" oninput="updateDeclared()">
+            <input name="declaration" placeholder="Declaration" oninput="updateDeclared()">
+        </label>
+    </div>
+    <h2 id="declaredPoints">Total Declared: 0</h2>
+    <button onclick="calculateFinal()">Calculate Final Points</button>
+    <h1 id="finalPoints">FINAL POINTS</h1>
+    <label>
+        <input id="saveName" placeholder="Save Name">
+    </label>
+    <button onclick="save()">SAVE</button>
+    <button onclick="load()">LOAD</button>
+</body>
+</html>

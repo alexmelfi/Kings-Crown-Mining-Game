@@ -1,0 +1,30 @@
+{
+  "name": "kingscrownexperiment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "nodemon --ignore \"round.json\" --exec electron .",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make --arch=\"x64\" targets=\"@electron-forge/maker-squirrel\" --platform=\"win32\""
+  },
+  "author": "Alex Melfi",
+  "license": "ISC",
+  "devDependencies": {
+    "@electron-forge/cli": "^7.3.0",
+    "@electron-forge/maker-deb": "^7.3.0",
+    "@electron-forge/maker-rpm": "^7.3.0",
+    "@electron-forge/maker-squirrel": "^7.3.0",
+    "@electron-forge/maker-zip": "^7.3.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.3.0",
+    "@electron-forge/plugin-fuses": "^7.3.0",
+    "electron": "^29.0.1",
+    "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "@electron/fuses": "^1.7.0",
+    "electron-squirrel-startup": "^1.0.0"
+  }
+}
