@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require('electron')
 
-let mainWindow
+let mainWindow, secondWindow
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -16,7 +16,21 @@ const createWindow = () => {
     backgroundColor: '#82083d'
   })
 
+  secondWindow = new BrowserWindow({
+    width: 600, height: 300,
+    minWidth: 600, minHeight: 300,
+    webPreferences: {
+      // --- !! IMPORTANT !! ---
+      // Disable 'contextIsolation' to allow 'nodeIntegration'
+      // 'contextIsolation' defaults to "true" as from Electron v12
+      contextIsolation: false,
+      nodeIntegration: true
+    },
+    backgroundColor: '#82083d'
+  })
+
   mainWindow.loadFile("index.html")
+  secondWindow.loadFile('scoreboard.html')
 
   mainWindow.on('closed', () => { mainWindow = null })
 }

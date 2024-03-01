@@ -10,53 +10,56 @@
 </head>
 <!-- Mineral Counting for Miners -->
 <body>
-    <h1 class="main-header">MINING GAME</h1>
+    <h1>MINER GAME</h1>
     <h1 id="minerList"></h1>
-    <div class="card">
-        <h2 id="bronzeDisplay">Bronze: 0</h2>
-        <label>
-            <button class="button-92" onclick="updateScore('bronze')">-</button>
-            <button class="button-92" onclick="updateScore('bronze', true)">+</button>
-        </label>
-    </div>
+    <div name="ores">
+        <div>
+            <h2 id="bronzeDisplay">Bronze: 0</h2>
+            <label>
+                <button onclick="updateScore('bronze')" name="mineralButton">-</button>
+                <button onclick="updateScore('bronze', true)" name="mineralButton">+</button>
+            </label>
+        </div>
 
-    <div class="card">
-        <h2 id="silverDisplay">Silver: 0</h2>
-        <label>
-            <button class="button-92" onclick="updateScore('silver')">-</button>
-            <button class="button-92" onclick="updateScore('silver', true)">+</button>
-        </label>
-    </div>
+        <div>
+            <h2 id="silverDisplay">Silver: 0</h2>
+            <label>
+                <button onclick="updateScore('silver')" name="mineralButton">-</button>
+                <button onclick="updateScore('silver', true)" name="mineralButton">+</button>
+            </label>
+        </div>
 
-    <div class="card">
-        <h2 id="goldDisplay">Gold: 0</h2>
-        <label>
-            <button class="button-92" onclick="updateScore('gold')">-</button>
-            <button class="button-92" onclick="updateScore('gold', true)">+</button>
-        </label>
-    </div>
+        <div>
+            <h2 id="goldDisplay">Gold: 0</h2>
+            <label>
+                <button onclick="updateScore('gold')" name="mineralButton">-</button>
+                <button onclick="updateScore('gold', true)" name="mineralButton">+</button>
+            </label>
+        </div>
 
-    <div class="card">
-        <h2 id="diamondDisplay">Diamonds: 0</h2>
-        <label>
-            <button class="button-92" onclick="updateScore('diamond')">-</button>
-            <button class="button-92" onclick="updateScore('diamond', true)">+</button>
-        </label>
-    </div>
+        <div>
+            <h2 id="diamondDisplay">Diamonds: 0</h2>
+            <label>
+                <button onclick="updateScore('diamond')" name="mineralButton">-</button>
+                <button onclick="updateScore('diamond', true)" name="mineralButton">+</button>
+            </label>
+        </div>
 
-    <div class="card">
-        <h2 id="bombDisplay">Bombs: 0</h2>
-        <label>
-            <button class="button-92" onclick="updateScore('bomb')">-</button>
-            <button class="button-92" onclick="updateScore('bomb', true)">+</button>
-        </label>
+        <div>
+            <h2 id="bombDisplay">Bombs: 0</h2>
+            <label>
+                <button onclick="updateScore('bomb')" name="mineralButton">-</button>
+                <button onclick="updateScore('bomb', true)" name="mineralButton">+</button>
+            </label>
+        </div>
     </div>
+    <br>
 
     <h2 id="score">Score: 0</h2>
 </body>
 <!-- Tracking Players and Teams -->
 <body>
-    <div class="card">
+    <div name="team">
         <h2>Team 1</h2>
         <label>Mining?</label>
         <label>
@@ -75,7 +78,7 @@
             <input name="declaration" placeholder="Declaration" oninput="updateDeclared()" type="number">
         </label>
     </div>
-    <div class="card">
+    <div name="team">
         <h2>Team 2</h2>
         <label>Mining?</label>
         <label>
@@ -94,7 +97,7 @@
             <input name="declaration" placeholder="Declaration" oninput="updateDeclared()">
         </label>
     </div>
-    <div class="card">
+    <div name="team">
         <h2>Team 3</h2>
         <label>Mining?</label>
         <label>
@@ -113,9 +116,9 @@
             <input name="declaration" placeholder="Declaration" oninput="updateDeclared()">
         </label>
     </div>
-    <h2 id="declaredPoints">Total Declared: 0</h2>
+    <h2 id="declaredPoints" class="Total">Total Declared: 0</h2>
     <button onclick="calculateFinal()">Calculate Final Points</button>
-    <h1 id="finalPoints">FINAL POINTS</h1>
+    <h1 id="finalPoints"></h1>
     <label>
         <input id="saveName" placeholder="Save Name">
     </label>
