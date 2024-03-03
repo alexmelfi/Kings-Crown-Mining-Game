@@ -1,4 +1,5 @@
 const fs = require('fs')
+const { ipcRenderer } = require('electron')
 
 // player list
 let playerList = Array.from(document.querySelectorAll("input[name=player]"))
@@ -50,6 +51,23 @@ let teamThreeData = {
   score: 0,
   declared: [],
   pointsAwarded: []
+}
+
+// object that holds data to send to the scoreboard
+const toSend = {
+  data: 'look ma im data'
+}
+
+ipcRenderer.on('toMain', (e, args) => {
+  console.log(args)
+})
+
+const sendPlayersToScoreboard = () => {
+  ipcRenderer.send('toScoreboard', { players: playerList })
+}
+
+const sendPointsToScoreboard = () => {
+  ipcRenderer.send('toScoreboard', { score: checkTeam().pointsAwarded })
 }
 
 // save game data to a JSON file
@@ -114,6 +132,7 @@ const updateNames = () => {
     .map(p => p.value)
 
   minerUpdate(checkRadios(), "minerList")
+  sendPlayersToScoreboard()
 }
 
 // executes when a radio is changed
@@ -292,7 +311,6 @@ const receiveDeclared = (pointArray) => {
 
 // splits points between mining players
 const splitPoints = (pointArray, toSplit) => {
-  console.log('Before: ' + pointArray)
   switch (checkRadios()) {
     case 1:
       pointArray[0] += Math.trunc(toSplit / 3)
@@ -309,7 +327,6 @@ const splitPoints = (pointArray, toSplit) => {
       pointArray[7] += Math.trunc(toSplit / 3)
       pointArray[8] += Math.trunc(toSplit / 3)
   }
-  console.log('After: ' + pointArray)
 }
 
 // gives the highest declared point value to the player with the lowest declared point value.

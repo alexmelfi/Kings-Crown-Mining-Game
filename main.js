@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 
 let mainWindow, secondWindow
 
@@ -34,6 +34,14 @@ const createWindow = () => {
 
   mainWindow.on('closed', () => { mainWindow = null })
 }
+
+ipcMain.on('toMain', (e, args) => {
+  mainWindow.webContents.send('toMain', args)
+})
+
+ipcMain.on('toScoreboard', (e, args) => {
+  secondWindow.webContents.send('toScoreboard', args)
+})
 
 app.on('ready', createWindow)
 
