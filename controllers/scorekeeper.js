@@ -5,6 +5,8 @@ const { ipcRenderer } = require('electron')
 let playerList = Array.from(document.querySelectorAll("input[name=player]"))
   .map(p => p.value)
 
+const totalScore = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+
 // object that holds team data
 // mineralCounts: holds counts of each mineral
 // score: mining score for the team
@@ -53,27 +55,41 @@ let teamThreeData = {
   pointsAwarded: []
 }
 
-// object that holds data to send to the scoreboard
-const toSend = {
-  data: 'look ma im data'
+let finalPoints = {
+  roundOne: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  roundTwo: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  roundThree: [0, 0, 0, 0, 0, 0, 0, 0, 0]
 }
 
+// receiver for data sent from the scoreboard
 ipcRenderer.on('toMain', (e, args) => {
   console.log(args)
 })
 
-const sendPlayersToScoreboard = () => {
-  ipcRenderer.send('toScoreboard', { players: playerList })
-}
-
-const sendPointsToScoreboard = () => {
-  ipcRenderer.send('toScoreboard', { score: checkTeam().pointsAwarded })
+// sender for sending data to the scoreboard
+const sendToScoreboard = () => {
+  ipcRenderer.send('toScoreboard', {
+    players: playerList,
+    round: checkRound(),
+    score: checkTeam().pointsAwarded,
+    mining: checkRadios(),
+    totalMined: checkTeam().score,
+    declared: checkTeam().declared,
+    finalPoints: document.getElementById('showFinalPoints').checked
+      ? finalPoints.roundOne
+        .map((s, i) => s += finalPoints.roundTwo[i])
+        .map((s, i) => s += finalPoints.roundThree[i])
+        : [],
+    showEndPhase: document.getElementById('showEndPhase').checked,
+    showFinalPoints: document.getElementById('showFinalPoints').checked
+  })
 }
 
 // save game data to a JSON file
 const save = () => {
   const data = [ JSON.stringify(playerList), JSON.stringify(teamOneData), JSON.stringify(teamTwoData), JSON.stringify(teamThreeData) ]
-  const saveName = document.getElementById('saveName').value ? document.getElementById('saveName').value : 'round'
+  const saveName = (document.getElementById('saveName').value ? document.getElementById('saveName').value : 'round')
+    + "-round-" + checkRound()
 
   fs.writeFile(saveName + ".json", JSON.stringify(data), err => {
     if (err) {
@@ -88,15 +104,16 @@ const save = () => {
 
 // load game data from JSON file
 const load = () => {
-  const saveName = document.getElementById('saveName').value ? document.getElementById('saveName').value : 'round'
+  const saveName = (document.getElementById('saveName').value ? document.getElementById('saveName').value : 'round')
+    + '-round-' + checkRound()
   const data = JSON.parse(fs.readFileSync(saveName + '.json').toString())
 
-  console.log(data)
-
-  playerList = JSON.parse(data[0])
-  teamOneData = JSON.parse(data[1])
-  teamTwoData = JSON.parse(data[2])
-  teamThreeData = JSON.parse(data[3])
+  if (data) {
+    playerList = JSON.parse(data[0])
+    teamOneData = JSON.parse(data[1])
+    teamTwoData = JSON.parse(data[2])
+    teamThreeData = JSON.parse(data[3])
+  }
 
   changeRadio()
 }
@@ -132,7 +149,7 @@ const updateNames = () => {
     .map(p => p.value)
 
   minerUpdate(checkRadios(), "minerList")
-  sendPlayersToScoreboard()
+  sendToScoreboard()
 }
 
 // executes when a radio is changed
@@ -143,11 +160,30 @@ const changeRadio = () => {
   updateDeclared(checkRadios())
 }
 
-// returns a number that corresponds to the radio which is checked
-const checkRadios = () => {
-  const radios = document.querySelectorAll('input[type=radio]')
+// changes to another round
+const changeRound = () => {
+  save()
+  checkRound()
+  load()
+}
 
-  let n = 1;
+// returns a number that corresponds to the mining radio which is checked
+const checkRadios = () => {
+  const radios = document.querySelectorAll('input[name=miningRadio]')
+
+  let n = 1
+  for (const r of radios) {
+    if (r.checked) {
+      return n
+    }
+    n++
+  }
+}
+
+const checkRound = () => {
+  const radios = document.querySelectorAll('input[name=roundRadio]')
+
+  let n = 1
   for (const r of radios) {
     if (r.checked) {
       return n
@@ -299,7 +335,19 @@ const calculateFinal = () => {
 
   teamObj.pointsAwarded = [...points]
 
+  switch (checkRound()) {
+    case 1:
+      finalPoints.roundOne.map((s, i) => s += teamObj.pointsAwarded[i])
+      break
+    case 2:
+      finalPoints.roundTwo.map((s, i) => s += teamObj.pointsAwarded[i])
+      break
+    case 3:
+      finalPoints.roundThree.map((s, i) => s += teamObj.pointsAwarded[i])
+  }
+
   document.getElementById("finalPoints").innerText = "FINAL POINTS: " + finalString(points)
+  sendToScoreboard()
 }
 
 // players who are not mining receive their declared points

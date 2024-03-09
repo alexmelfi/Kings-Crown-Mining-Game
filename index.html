@@ -10,7 +10,34 @@
 </head>
 <body>
 <div class="grid-container">
+    <h2>Scoreboard Display Controls</h2>
+    <label>
+        <input type="checkbox" id="showEndPhase">
+        Show Declared Points
+    </label>
+    <label>
+        <input type="checkbox" id="showFinalPoints">
+        Show Final Points
+    </label>
+</div>
+<div class="grid-container">
     <h1>MINER GAME</h1>
+    <div name="round">
+        <label>
+            <input type="radio" name="roundRadio" oninput="changeRadio()" checked="checked">
+            Round 1
+        </label>
+
+        <label>
+            <input type="radio" name="roundRadio" oninput="changeRadio()">
+            Round 2
+        </label>
+
+        <label>
+            <input type="radio" name="roundRadio" oninput="changeRadio()">
+            Round 3
+        </label>
+    </div>
 <div name="ores" class="grid-item">
     <h2 id="bronzeDisplay">Bronze: 0</h2>
     <label>
@@ -101,7 +128,7 @@
                 </table>
     <h2><u>Team 2</u></h2>
     <label>
-        <input type="radio" name="miningRadio" oninput="changeRadio()" checked="checked">
+        <input type="radio" name="miningRadio" oninput="changeRadio()">
         Mining?
     </label>
         <table>
@@ -142,7 +169,7 @@
         </table>
     <h2><u>Team 3</u></h2>
     <label>
-        <input type="radio" name="miningRadio" oninput="changeRadio()" checked="checked">
+        <input type="radio" name="miningRadio" oninput="changeRadio()">
         Mining?
     </label>
     <table>
@@ -182,6 +209,10 @@
         </tr>
     </table>
 </div>
+    <div>
+        <button name="saves" onclick="calculateFinal()">Calculate Final Score</button>
+        <h2 id="finalPoints"></h2>
+    </div>
 <div name="SaveMenu" class="grid-item">
     <label>
         <input id="saveName" placeholder="Save Name">
