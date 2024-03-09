@@ -13,7 +13,7 @@ const createWindow = () => {
       contextIsolation: false,
       nodeIntegration: true
     },
-    backgroundColor: '#82083d'
+    backgroundColor: '#121212'
   })
 
   secondWindow = new BrowserWindow({
@@ -26,7 +26,7 @@ const createWindow = () => {
       contextIsolation: false,
       nodeIntegration: true
     },
-    backgroundColor: '#82083d'
+    backgroundColor: '#121212'
   })
 
   mainWindow.loadFile("index.html")
