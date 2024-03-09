@@ -10,7 +10,7 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        exe: "Kings-Crown.exe"
+        description: "Application for King's Crown Mining Game"
       },
     },
     {
