@@ -5,6 +5,8 @@ const { ipcRenderer } = require('electron')
 let playerList = Array.from(document.querySelectorAll("input[name=player]"))
   .map(p => p.value)
 
+let currentRound = 1
+
 const totalScore = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 // object that holds team data
@@ -89,9 +91,9 @@ const sendToScoreboard = () => {
 const save = () => {
   const data = [ JSON.stringify(playerList), JSON.stringify(teamOneData), JSON.stringify(teamTwoData), JSON.stringify(teamThreeData) ]
   const saveName = (document.getElementById('saveName').value ? document.getElementById('saveName').value : 'round')
-    + "-round-" + checkRound()
+    + "-round-" + currentRound
 
-  fs.writeFile(saveName + ".json", JSON.stringify(data), err => {
+  fs.writeFileSync(saveName + ".json", JSON.stringify(data), err => {
     if (err) {
       console.log(err)
 
@@ -105,15 +107,15 @@ const save = () => {
 // load game data from JSON file
 const load = () => {
   const saveName = (document.getElementById('saveName').value ? document.getElementById('saveName').value : 'round')
-    + '-round-' + checkRound()
+    + '-round-' + currentRound
   const data = JSON.parse(fs.readFileSync(saveName + '.json').toString())
 
-  if (data) {
+  console.log(saveName)
+
     playerList = JSON.parse(data[0])
     teamOneData = JSON.parse(data[1])
     teamTwoData = JSON.parse(data[2])
     teamThreeData = JSON.parse(data[3])
-  }
 
   changeRadio()
 }
@@ -158,6 +160,7 @@ const changeRadio = () => {
   minerUpdate(checkRadios())
   updateScore(checkRadios())
   updateDeclared(checkRadios())
+  sendToScoreboard()
 }
 
 // changes to another round
@@ -186,6 +189,7 @@ const checkRound = () => {
   let n = 1
   for (const r of radios) {
     if (r.checked) {
+      currentRound = n
       return n
     }
     n++
@@ -298,9 +302,9 @@ const updateDeclared = () => {
       teamObj.declared.splice(6, 3, 0, 0, 0)
   }
 
-  document.getElementById("declaredPoints").innerText = "Total Declared: "
-    + teamObj.declared.reduce((m, n) => n ? m + n : m, 0)
-      .toString()
+  // document.getElementById("declaredPoints").innerText = "Total Declared: "
+  //   + teamObj.declared.reduce((m, n) => n ? m + n : m, 0)
+  //     .toString()
 }
 
 // calculates the points to award to each player
