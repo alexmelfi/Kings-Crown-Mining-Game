@@ -12,11 +12,11 @@
 <div class="grid-container">
     <h2>Scoreboard Display Controls</h2>
     <label>
-        <input type="checkbox" id="showEndPhase">
+        <input type="checkbox" id="showEndPhase" oninput="sendToScoreboard()">
         Show Declared Points
     </label>
     <label>
-        <input type="checkbox" id="showFinalPoints">
+        <input type="checkbox" id="showFinalPoints" oninput="getTotalPoints()">
         Show Final Points
     </label>
 </div>

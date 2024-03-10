@@ -7,7 +7,7 @@ let playerList = Array.from(document.querySelectorAll("input[name=player]"))
 
 let currentRound = 1
 
-const totalScore = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+let totalScore = []
 
 // object that holds team data
 // mineralCounts: holds counts of each mineral
@@ -83,15 +83,15 @@ const sendToScoreboard = () => {
         .map((s, i) => s += finalPoints.roundThree[i])
         : [],
     showEndPhase: document.getElementById('showEndPhase').checked,
-    showFinalPoints: document.getElementById('showFinalPoints').checked
+    showFinalPoints: document.getElementById('showFinalPoints').checked,
+    totalScore: totalScore
   })
 }
 
 // save game data to a JSON file
 const save = () => {
   const data = [ JSON.stringify(playerList), JSON.stringify(teamOneData), JSON.stringify(teamTwoData), JSON.stringify(teamThreeData) ]
-  const saveName = (document.getElementById('saveName').value ? document.getElementById('saveName').value : 'round')
-    + "-round-" + currentRound
+  const saveName = getSaveName() + currentRound
 
   fs.writeFileSync(saveName + ".json", JSON.stringify(data), err => {
     if (err) {
@@ -106,11 +106,9 @@ const save = () => {
 
 // load game data from JSON file
 const load = () => {
-  const saveName = (document.getElementById('saveName').value ? document.getElementById('saveName').value : 'round')
-    + '-round-' + currentRound
-  const data = JSON.parse(fs.readFileSync(saveName + '.json').toString())
+  const saveName = getSaveName() + currentRound
 
-  console.log(saveName)
+  const data = JSON.parse(fs.readFileSync(saveName + '.json').toString())
 
     playerList = JSON.parse(data[0])
     teamOneData = JSON.parse(data[1])
@@ -119,6 +117,32 @@ const load = () => {
 
   changeRadio()
 }
+
+// calculate the final points from each round
+const getTotalPoints = () => {
+  const saveName = getSaveName()
+
+  const roundOneData = JSON.parse(fs.readFileSync(saveName + 1 + '.json').toString())
+  const roundTwoData = JSON.parse(fs.readFileSync(saveName + 2 + '.json').toString())
+  const roundThreeData = JSON.parse(fs.readFileSync(saveName + 3 + '.json').toString())
+
+  const roundOnePoints = JSON.parse(roundOneData[1]).pointsAwarded
+      .map((p, i) => p + JSON.parse(roundOneData[2]).pointsAwarded[i] + JSON.parse(roundOneData[3]).pointsAwarded[i])
+
+  const roundTwoPoints = JSON.parse(roundTwoData[1]).pointsAwarded
+      .map((p, i) => p + JSON.parse(roundTwoData[2]).pointsAwarded[i] + JSON.parse(roundTwoData[3]).pointsAwarded[i])
+
+  const roundThreePoints = JSON.parse(roundThreeData[1]).pointsAwarded
+      .map((p, i) => p + JSON.parse(roundThreeData[2]).pointsAwarded[i] + JSON.parse(roundThreeData[3]).pointsAwarded[i])
+
+  totalScore = roundOnePoints
+      .map((p, i) => p + roundTwoPoints[i] + roundThreePoints[i])
+
+  sendToScoreboard()
+}
+
+// gets the name of the save from the form
+const getSaveName = () => (document.getElementById('saveName').value ? document.getElementById('saveName').value : 'round')  + "-round-"
 
 // updates the form to reflect the backend values
 const updateForm = () => {

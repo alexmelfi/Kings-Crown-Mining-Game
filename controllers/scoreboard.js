@@ -10,7 +10,8 @@ const received = {
   players: [],
   score: [],
   totalMined: 0,
-  declared: []
+  declared: [],
+  showFinalScore: false
 }
 
 // scoreboard will receive data that includes player names and scores
@@ -21,6 +22,7 @@ ipcRenderer.on('toScoreboard', (e, args) => {
   received.totalMined = args.totalMined
   received.declared = args.declared
   received.score = args.score
+  received.showFinalScore = args.showFinalPoints
 
   if (args.showEndPhase) {
     document.getElementById('team1totals').hidden = false
@@ -34,7 +36,8 @@ ipcRenderer.on('toScoreboard', (e, args) => {
 
   if (args.showFinalPoints) {
     getScores()
-        .map((s, i) => s.innerText = args.finalPoints[i])
+        .map((s, i) => s.innerText = args.totalScore[i])
+    pointTypes()
   } else {
     updateNames()
     updateScores()
@@ -79,21 +82,27 @@ const pointTypes = () => {
 
   teamArray.splice(3, 3)
 
-  switch (miningTeam) {
-    case 1:
-      teamArray[0].innerText = 'Total Mined:'
-      teamArray[1].innerText = 'Declared:'
-      teamArray[2].innerText = 'Declared:'
-      break
-    case 2:
-      teamArray[0].innerText = 'Declared'
-      teamArray[1].innerText = 'Total Mined:'
-      teamArray[2].innerText = 'Declared:'
-      break
-    case 3:
-      teamArray[0].innerText = 'Declared:'
-      teamArray[1].innerText = 'Declared:'
-      teamArray[2].innerText = 'Total Mined:'
+  if (received.showFinalScore) {
+    teamArray[0].innerText = ''
+    teamArray[1].innerText = ''
+    teamArray[2].innerText = ''
+  } else {
+    switch (miningTeam) {
+      case 1:
+        teamArray[0].innerText = 'Total Mined:'
+        teamArray[1].innerText = 'Declared:'
+        teamArray[2].innerText = 'Declared:'
+        break
+      case 2:
+        teamArray[0].innerText = 'Declared'
+        teamArray[1].innerText = 'Total Mined:'
+        teamArray[2].innerText = 'Declared:'
+        break
+      case 3:
+        teamArray[0].innerText = 'Declared:'
+        teamArray[1].innerText = 'Declared:'
+        teamArray[2].innerText = 'Total Mined:'
+    }
   }
 }
 
