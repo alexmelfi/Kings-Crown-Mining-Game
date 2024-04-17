@@ -1,6 +1,12 @@
 const fs = require('fs')
 const { ipcRenderer } = require('electron')
 
+const team = require(__dirname + '/models/team')
+const fileManager = require(__dirname + '/util/fileManager')
+
+const save = fileManager.save
+const load = fileManager.load
+
 // player list
 let playerList = Array.from(document.querySelectorAll("input[name=player]"))
   .map(p => p.value)
@@ -16,46 +22,13 @@ let totalScore = []
 // pointsAwarded: list of points awarded to each player
 
 // data when team one is mining
-let teamOneData = {
-  mineralCounts: {
-    nBronze: 0,
-    nSilver: 0,
-    nGold: 0,
-    nDiamond: 0,
-    nBomb: 0
-  },
-  score: 0,
-  declared: [],
-  pointsAwarded: []
-}
+let teamOneData = { ...team }
 
 // data when team two is mining
-let teamTwoData = {
-  mineralCounts: {
-    nBronze: 0,
-    nSilver: 0,
-    nGold: 0,
-    nDiamond: 0,
-    nBomb: 0
-  },
-  score: 0,
-  declared: [],
-  pointsAwarded: []
-}
+let teamTwoData = { ...team }
 
 // data when team three is mining
-let teamThreeData = {
-  mineralCounts: {
-    nBronze: 0,
-    nSilver: 0,
-    nGold: 0,
-    nDiamond: 0,
-    nBomb: 0
-  },
-  score: 0,
-  declared: [],
-  pointsAwarded: []
-}
+let teamThreeData = { ...team }
 
 let finalPoints = {
   roundOne: [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -86,36 +59,6 @@ const sendToScoreboard = () => {
     showFinalPoints: document.getElementById('showFinalPoints').checked,
     totalScore: totalScore
   })
-}
-
-// save game data to a JSON file
-const save = () => {
-  const data = [ JSON.stringify(playerList), JSON.stringify(teamOneData), JSON.stringify(teamTwoData), JSON.stringify(teamThreeData) ]
-  const saveName = getSaveName() + currentRound
-
-  fs.writeFileSync(saveName + ".json", JSON.stringify(data), err => {
-    if (err) {
-      console.log(err)
-
-      throw err
-    }
-
-    console.log('Successfully wrote file')
-  })
-}
-
-// load game data from JSON file
-const load = () => {
-  const saveName = getSaveName() + currentRound
-
-  const data = JSON.parse(fs.readFileSync(saveName + '.json').toString())
-
-    playerList = JSON.parse(data[0])
-    teamOneData = JSON.parse(data[1])
-    teamTwoData = JSON.parse(data[2])
-    teamThreeData = JSON.parse(data[3])
-
-  changeRadio()
 }
 
 // calculate the final points from each round
@@ -187,11 +130,41 @@ const changeRadio = () => {
   sendToScoreboard()
 }
 
+const checkRound = () => {
+  const radios = document.querySelectorAll('input[name=roundRadio]')
+
+  let n = 1
+  for (const r of radios) {
+    if (r.checked) {
+      currentRound = n
+      return n
+    }
+    n++
+  }
+}
+
 // changes to another round
 const changeRound = () => {
-  save()
+  save(getSaveName() + currentRound, [playerList, teamOneData, teamTwoData, teamThreeData])
+
   checkRound()
-  load()
+
+  const data = load(getSaveName() + currentRound)
+  changeRadio()
+
+  if (data) {
+    playerList = data[0]
+    teamOneData = data[1]
+    teamTwoData = data[2]
+    teamThreeData = data[3]
+  }
+  else {
+    teamOneData = { ...team }
+    teamTwoData = { ...team }
+    teamThreeData = { ...team }
+  }
+
+  updateForm()
 }
 
 // returns a number that corresponds to the mining radio which is checked
@@ -201,19 +174,6 @@ const checkRadios = () => {
   let n = 1
   for (const r of radios) {
     if (r.checked) {
-      return n
-    }
-    n++
-  }
-}
-
-const checkRound = () => {
-  const radios = document.querySelectorAll('input[name=roundRadio]')
-
-  let n = 1
-  for (const r of radios) {
-    if (r.checked) {
-      currentRound = n
       return n
     }
     n++
@@ -438,3 +398,26 @@ const finalString = (pointsArray) => {
 
   return str
 }
+
+document.getElementById('saveButton')
+  .addEventListener('click', () =>
+  save(getSaveName() + currentRound, [playerList, teamOneData, teamTwoData, teamThreeData]))
+
+document.getElementById('loadButton')
+  .addEventListener('click', () => {
+    const data = load(getSaveName() + currentRound)
+
+    if (data) {
+      playerList = data[0]
+      teamOneData = data[1]
+      teamTwoData = data[2]
+      teamThreeData = data[3]
+    }
+    else {
+      teamOneData = { ...team }
+      teamTwoData = { ...team }
+      teamThreeData = { ...team }
+    }
+
+    updateForm()
+  })
