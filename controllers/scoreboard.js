@@ -1,30 +1,30 @@
 const { ipcRenderer } = require("electron")
 
-// tracker for current round
-let roundNum = 1
-
 // tracker for currently mining team
 let miningTeam = 1
 
-const received = {
-  players: [],
-  score: [],
-  totalMined: 0,
-  declared: [],
-  showFinalScore: false
-}
+let received = {}
 
 // scoreboard will receive data that includes player names and scores
 ipcRenderer.on('toScoreboard', (e, args) => {
-  received.players = args.players
-  roundNum = args.round
-  miningTeam = args.mining
-  received.totalMined = args.totalMined
-  received.declared = args.declared
-  received.score = args.score
-  received.showFinalScore = args.showFinalPoints
+  received = { ...args }
 
-  if (args.showEndPhase) {
+  showFinalPoints(received.showEndPhase)
+
+  if (received.showFinalPoints) {
+    getScores()
+        .map((s, i) =>
+          s.innerText = received.totalScore[i])
+    pointTypes()
+  } else {
+    updateNames()
+    updateScores()
+  }
+})
+
+// hide or show total point values
+const showFinalPoints = hide => {
+  if (hide) {
     document.getElementById('team1totals').hidden = false
     document.getElementById('team2totals').hidden = false
     document.getElementById('team3totals').hidden = false
@@ -33,54 +33,56 @@ ipcRenderer.on('toScoreboard', (e, args) => {
     document.getElementById('team2totals').hidden = true
     document.getElementById('team3totals').hidden = true
   }
-
-  if (args.showFinalPoints) {
-    getScores()
-        .map((s, i) => s.innerText = args.totalScore[i])
-    pointTypes()
-  } else {
-    updateNames()
-    updateScores()
-  }
-})
+}
 
 // updates the names displayed
 const updateNames = () => {
   getPlayers()
-    .map((p, i) => received.players[i] ? p.innerText = received.players[i] : p.innerText = 'Player')
+    .map((p, i) =>
+      received.players[i] ? p.innerText = received.players[i] : p.innerText = 'Player')
 }
 
 // updates the scores displayed
 const updateScores = () => {
+  // set labels to reflect which team mined during the round
   pointTypes()
 
+  // set declared points for all players
   setDeclaredPoints()
 
+  // change display for the mining team and update scoreboard
   setMiningPoints()
 }
 
-// Sets the point type labels for each team
-const pointTypes = () => {
+// get the point type labels from DOM
+const getPointLabels = () => {
   let teamArray = Array.from(
-      document.getElementById("playerTable1")
-          .getElementsByTagName('tr')[1]
-          .getElementsByTagName('td'))
+    document.getElementById("playerTable1")
+      .getElementsByTagName('tr')[1]
+      .getElementsByTagName('td'))
 
   teamArray.splice(1, 3)
 
   teamArray = teamArray.concat(Array.from(
-      document.getElementById("playerTable2")
-          .getElementsByTagName('tr')[1]
-          .getElementsByTagName('td')))
+    document.getElementById("playerTable2")
+      .getElementsByTagName('tr')[1]
+      .getElementsByTagName('td')))
 
   teamArray.splice(2, 3)
 
   teamArray = teamArray.concat(Array.from(
-      document.getElementById("playerTable3")
-          .getElementsByTagName('tr')[1]
-          .getElementsByTagName('td')))
+    document.getElementById("playerTable3")
+      .getElementsByTagName('tr')[1]
+      .getElementsByTagName('td')))
 
   teamArray.splice(3, 3)
+
+  return teamArray
+}
+
+// sets the point type labels for each team
+const pointTypes = () => {
+  const teamArray = getPointLabels()
 
   if (received.showFinalScore) {
     teamArray[0].innerText = ''
@@ -106,6 +108,7 @@ const pointTypes = () => {
   }
 }
 
+// change the display to reflect who mined during a round
 const setMiningPoints = () => {
   let tempScores = getScores()
 
@@ -127,11 +130,13 @@ const setMiningPoints = () => {
   }
 }
 
+// change the display to show the points declared by each player
 const setDeclaredPoints = () => {
   getScores()
       .map((s, i) => s.innerText = received.declared[i])
 }
 
+// change the display to show the total amount of points each player received during a round
 const showPointTotals = () => {
   getScores()
       .map((s, i) => s.innerText = received.score[i])
@@ -189,31 +194,23 @@ const getScores = () => {
   return scoresArray
 }
 
+// calculate total amount of points earned by players at the end of a round
 const calculateTotals = () => {
-  let scoresArray = Array.from(
-      document.getElementById("playerTable1")
-          .getElementsByTagName('tr')[1]
-          .getElementsByTagName('td'))
-
-  scoresArray.shift()
-
-  scoresArray = scoresArray.concat(Array.from(
-      document.getElementById("playerTable2")
-          .getElementsByTagName('tr')[1]
-          .getElementsByTagName('td')))
-
-  scoresArray.splice(3, 1)
-
-  scoresArray = scoresArray.concat(Array.from(
-      document.getElementById("playerTable3")
-          .getElementsByTagName('tr')[1]
-          .getElementsByTagName('td')))
-
-  scoresArray.splice(6, 1)
-
-  scoresArray.map((s, i) => {
-    s.innerText = (received.score1[i] ? received.score1[i] : 0)
-        + (received.score2[i] ? received.score2[i] : 0)
-        + (received.score3[i] ? received.score3[i] : 0)
+  getScores().map((s, i) => {
+    s.innerText = (received.score[0][i] ? received.score[0][i] : 0)
+      + (received.score[1][i] ? received.score[1][i] : 0)
+      + (received.score[2][i] ? received.score[2][i] : 0)
   })
 }
+
+module.exports.showFinalPoints = showFinalPoints
+module.exports.updateNames = updateNames
+module.exports.updateScores = updateScores
+module.exports.getPointLabels = getPointLabels
+module.exports.pointTypes = pointTypes
+module.exports.setMiningPoints = setMiningPoints
+module.exports.setDeclaredPoints = setDeclaredPoints
+module.exports.showPointTotals = showPointTotals
+module.exports.getPlayers = getPlayers
+module.exports.getScores = getScores
+//module.exports.calculateTotals = calculateTotals
