@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron')
 
 const team = require(__dirname + '/models/team')
 const fileManager = require(__dirname + '/util/fileManager')
+const calculator = require(__dirname + '/util/calculator')
 
 const save = fileManager.save
 const load = fileManager.load
@@ -14,12 +15,6 @@ let playerList = Array.from(document.querySelectorAll("input[name=player]"))
 let currentRound = 1
 
 let totalScore = []
-
-// object that holds team data
-// mineralCounts: holds counts of each mineral
-// score: mining score for the team
-// declared: list of points declared by each player
-// pointsAwarded: list of points awarded to each player
 
 // data when team one is mining
 let teamOneData = { ...team }
@@ -285,118 +280,14 @@ const updateDeclared = () => {
     case 3:
       teamObj.declared.splice(6, 3, 0, 0, 0)
   }
-
-  // document.getElementById("declaredPoints").innerText = "Total Declared: "
-  //   + teamObj.declared.reduce((m, n) => n ? m + n : m, 0)
-  //     .toString()
 }
 
-// calculates the points to award to each player
+// calculate and update the final scores for the round
 const calculateFinal = () => {
-  // array keeps track of awarded points
-  const points = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+  const points = calculator.calculateFinal(checkTeam(), checkRadios(), finalPoints)
 
-  const teamObj = checkTeam()
-
-  const declaredPoints = teamObj.declared.reduce((m, n) => m + n)
-
-  // case if miners mined at least 3 bombs
-  if (teamObj.mineralCounts.nBomb >= 3) {
-    // players receive their declared points
-    receiveDeclared(points)
-  }
-  // case if miners found more mineral points than the points declared
-  else if (teamObj.score >= declaredPoints) {
-    // players receive their declared points
-    receiveDeclared(points)
-
-    //miners split the remainder
-    splitPoints(points, teamObj.score - declaredPoints)
-  }
-  // case if miners found less mineral points than points declared
-  else if (teamObj.score < declaredPoints) {
-    // points are split between miners
-    splitPoints(points, teamObj.score)
-    // highest declared goes to the lowest declared
-    highToLow(points)
-  }
-
-  teamObj.pointsAwarded = [...points]
-
-  switch (checkRound()) {
-    case 1:
-      finalPoints.roundOne.map((s, i) => s += teamObj.pointsAwarded[i])
-      break
-    case 2:
-      finalPoints.roundTwo.map((s, i) => s += teamObj.pointsAwarded[i])
-      break
-    case 3:
-      finalPoints.roundThree.map((s, i) => s += teamObj.pointsAwarded[i])
-  }
-
-  document.getElementById("finalPoints").innerText = "FINAL POINTS: " + finalString(points)
+  document.getElementById("finalPoints").innerText = "FINAL POINTS: " + calculator.finalString(points, playerList)
   sendToScoreboard()
-}
-
-// players who are not mining receive their declared points
-const receiveDeclared = (pointArray) => {
-  for (let i = 0; i < 9; i++) {
-    pointArray[i] = checkTeam().declared[i]
-  }
-}
-
-// splits points between mining players
-const splitPoints = (pointArray, toSplit) => {
-  switch (checkRadios()) {
-    case 1:
-      pointArray[0] += Math.trunc(toSplit / 3)
-      pointArray[1] += Math.trunc(toSplit / 3)
-      pointArray[2] += Math.trunc(toSplit / 3)
-      break;
-    case 2:
-      pointArray[3] += Math.trunc(toSplit / 3)
-      pointArray[4] += Math.trunc(toSplit / 3)
-      pointArray[5] += Math.trunc(toSplit / 3)
-      break;
-    case 3:
-      pointArray[6] += Math.trunc(toSplit / 3)
-      pointArray[7] += Math.trunc(toSplit / 3)
-      pointArray[8] += Math.trunc(toSplit / 3)
-  }
-}
-
-// gives the highest declared point value to the player with the lowest declared point value.
-// if multiple players have the highest declared point value, the lowest player receives all of those points
-// if multiple players have the lowest declared point value, they will split the points
-const highToLow = (pointsArray) => {
-  let teamObj = checkTeam()
-
-  const highest = Math.max(...teamObj.declared)
-  const lowest = Math.min(...teamObj.declared.filter(n => n !== 0))
-  const toAdd = []
-  let toDistribute = 0
-
-  teamObj.declared.forEach((d, i) => {
-    if (d === highest) {
-      toDistribute += highest
-      pointsArray[i] -= highest
-    }
-    else if (d === lowest) {
-      toAdd.push(i)
-    }
-  })
-
-  toAdd.forEach(i => pointsArray[i] += Math.trunc(toDistribute / toAdd.length))
-}
-
-const finalString = (pointsArray) => {
-  let str = "";
-
-  for (let i = 0; i < 9; i++) {
-    str += "\n" + playerList[i] + ": " + pointsArray[i]
-  }
-
-  return str
 }
 
 document.getElementById('saveButton')
@@ -421,3 +312,19 @@ document.getElementById('loadButton')
 
     updateForm()
   })
+
+module.exports.sendToScoreboard = sendToScoreboard
+module.exports.getTotalPoints = getTotalPoints
+module.exports.getSaveName = getSaveName
+module.exports.updateForm = updateForm
+module.exports.updateNames = updateNames
+module.exports.changeRadio = changeRadio
+module.exports.checkRound = checkRound
+module.exports.changeRound = changeRound
+module.exports.checkRadios = checkRadios
+module.exports.checkTeam = checkTeam
+module.exports.minerUpdate = minerUpdate
+module.exports.updateScore = updateScore
+module.exports.updateMineralCountDisplay = updateMineralCountDisplay
+module.exports.updateDeclared = updateDeclared
+module.exports.calculateFinal = calculateFinal
