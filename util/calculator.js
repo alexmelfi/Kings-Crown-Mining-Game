@@ -1,4 +1,6 @@
 // players who are not mining receive their declared points
+// pointArray: array whose values correspond to the point values of each player.
+// team: team object which contains the game data for the current round.
 const receiveDeclared = (pointArray, team) => {
   for (let i = 0; i < 9; i++) {
     pointArray[i] = team.declared[i]
@@ -6,6 +8,9 @@ const receiveDeclared = (pointArray, team) => {
 }
 
 // splits points between mining players
+// pointArray: array whose values correspond to the point values of each player.
+// toSplit: total amount of points to split amongst mining players.
+// teamNum: number corresponding to the team which is currently mining.
 const splitPoints = (pointArray, toSplit, teamNum) => {
   switch (teamNum) {
     case 1:
@@ -28,7 +33,9 @@ const splitPoints = (pointArray, toSplit, teamNum) => {
 // gives the highest declared point value to the player with the lowest declared point value.
 // if multiple players have the highest declared point value, the lowest player receives all of those points
 // if multiple players have the lowest declared point value, they will split the points
-const highToLow = (pointsArray, team) => {
+// pointArray: array whose values correspond to the point values of each player.
+// team: team object which contains the game data for the current round.
+const highToLow = (pointArray, team) => {
   let teamObj = team
 
   const highest = Math.max(...teamObj.declared)
@@ -39,28 +46,32 @@ const highToLow = (pointsArray, team) => {
   teamObj.declared.forEach((d, i) => {
     if (d === highest) {
       toDistribute += highest
-      pointsArray[i] -= highest
+      pointArray[i] -= highest
     }
     else if (d === lowest) {
       toAdd.push(i)
     }
   })
 
-  toAdd.forEach(i => pointsArray[i] += Math.trunc(toDistribute / toAdd.length))
+  toAdd.forEach(i => pointArray[i] += Math.trunc(toDistribute / toAdd.length))
 }
 
-const finalString = (pointsArray, playerList) => {
+// pointArray: array whose values correspond to the point values of each player.
+// playerList: array containing the names of each player.
+const finalString = (pointArray, playerList) => {
   let str = "";
 
   for (let i = 0; i < 9; i++) {
-    str += "\n" + playerList[i] + ": " + pointsArray[i]
+    str += "\n" + playerList[i] + ": " + pointArray[i]
   }
 
   return str
 }
 
-// calculates the points to award to each player and updates values
-const calculateFinal = (team, teamNum, finalPoints) => {
+// calculates the points to award to each player and returns the points for each player as an array.
+// team: team object which contains the game data for the current round.
+// teamNum: number corresponding to the team which is currently mining.
+const calculateFinal = (team, teamNum) => {
   // array keeps track of awarded points
   const points = [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
 
@@ -91,16 +102,16 @@ const calculateFinal = (team, teamNum, finalPoints) => {
 
   teamObj.pointsAwarded = [...points]
 
-  switch (teamNum) {
-    case 1:
-      finalPoints.roundOne.map((s, i) => s += teamObj.pointsAwarded[i])
-      break
-    case 2:
-      finalPoints.roundTwo.map((s, i) => s += teamObj.pointsAwarded[i])
-      break
-    case 3:
-      finalPoints.roundThree.map((s, i) => s += teamObj.pointsAwarded[i])
-  }
+  // switch (teamNum) {
+  //   case 1:
+  //     finalPoints.roundOne.map((s, i) => {s += teamObj.pointsAwarded[i]; console.log(s); return s})
+  //     break
+  //   case 2:
+  //     finalPoints.roundTwo.map((s, i) => s += teamObj.pointsAwarded[i])
+  //     break
+  //   case 3:
+  //     finalPoints.roundThree.map((s, i) => s += teamObj.pointsAwarded[i])
+  // }
 
   return points
 }

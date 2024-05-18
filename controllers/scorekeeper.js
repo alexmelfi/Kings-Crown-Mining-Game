@@ -1,7 +1,7 @@
 const fs = require('fs')
 const { ipcRenderer } = require('electron')
 
-const team = require(__dirname + '/models/team')
+const Team = require(__dirname + '/models/team')
 const fileManager = require(__dirname + '/util/fileManager')
 const calculator = require(__dirname + '/util/calculator')
 
@@ -17,13 +17,13 @@ let currentRound = 1
 let totalScore = []
 
 // data when team one is mining
-let teamOneData = { ...team }
+let teamOneData = new Team
 
 // data when team two is mining
-let teamTwoData = { ...team }
+let teamTwoData = new Team
 
 // data when team three is mining
-let teamThreeData = { ...team }
+let teamThreeData = new Team
 
 let finalPoints = {
   roundOne: [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -45,11 +45,11 @@ const sendToScoreboard = () => {
     mining: checkRadios(),
     totalMined: checkTeam().score,
     declared: checkTeam().declared,
-    finalPoints: document.getElementById('showFinalPoints').checked
-      ? finalPoints.roundOne
-        .map((s, i) => s += finalPoints.roundTwo[i])
-        .map((s, i) => s += finalPoints.roundThree[i])
-        : [],
+    // finalPoints: document.getElementById('showFinalPoints').checked
+    //   ? finalPoints.roundOne
+    //     .map((s, i) => s += finalPoints.roundTwo[i])
+    //     .map((s, i) => s += finalPoints.roundThree[i])
+    //     : [],
     showEndPhase: document.getElementById('showEndPhase').checked,
     showFinalPoints: document.getElementById('showFinalPoints').checked,
     totalScore: totalScore
@@ -284,7 +284,7 @@ const updateDeclared = () => {
 
 // calculate and update the final scores for the round
 const calculateFinal = () => {
-  const points = calculator.calculateFinal(checkTeam(), checkRadios(), finalPoints)
+  const points = calculator.calculateFinal(checkTeam(), checkRadios())
 
   document.getElementById("finalPoints").innerText = "FINAL POINTS: " + calculator.finalString(points, playerList)
   sendToScoreboard()
