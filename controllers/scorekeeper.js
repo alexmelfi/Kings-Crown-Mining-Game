@@ -1,9 +1,9 @@
 const fs = require('fs')
 const { ipcRenderer } = require('electron')
 
-const Team = require(__dirname + '/models/team')
-const fileManager = require(__dirname + '/util/fileManager')
-const calculator = require(__dirname + '/util/calculator')
+const Team = require('../models/team')
+const fileManager = require('../util/fileManager')
+const calculator = require('../util/calculator')
 
 const save = fileManager.save
 const load = fileManager.load

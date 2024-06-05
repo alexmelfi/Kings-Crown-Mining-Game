@@ -20,7 +20,6 @@ module.exports = {
 
   // load game data from JSON file.
   // saveName: save name which is prefixed to the name of the save file.
-  // cb: function to call after file has been loaded
   // returns an array of size 4 with the first element being the list of players followed by three team objects.
   load: saveName => {
     try {
